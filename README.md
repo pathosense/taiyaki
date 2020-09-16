@@ -38,14 +38,12 @@ A PyTorch Basecaller for Oxford Nanopore Reads.
 
 1. [Workflows](#workflows)<br>
         * [Steps from fast5 files to basecalling](#steps-from-fast5-files-to-basecalling)<br>
-        * [Preparing a training set](#preparing-a-training-set)<br>
-        * [Basecalling](#basecalling)<br>
-        * [Modified bases](#modified-bases)<br>
-        * [Abinitio training](#abinitio-training)<br>
-7. [Environment variables](#environment-variables)
-8. [CUDA](#cuda)<br>
+        * [Preparing a training set (Taiyaki)](#preparing-a-training-set)<br>
+        * [Basecalling (Bonito)](#basecalling)<br>
+2. [Environment variables](#environment-variables)
+3. [CUDA](#cuda)<br>
         * [Troubleshooting](#troubleshooting)<br>
-9. [Using multiple GPUs](#using-multiple-gpus)<br>
+4. [Using multiple GPUs](#using-multiple-gpus)<br>
         * [How to launch training with multiple GPUs](#how-to-launch-training-with-multiple-gpus)<br>
         * [Choice of learning rates for multi-GPU training](#choice-of-learning-rates-for-multi-gpu-training)<br>
         * [Selection of GPUs](#selection-of-gpus-for-multi-gpu-training)<br>
@@ -153,15 +151,14 @@ Convert taiyaki chunkify file output using Bonito's convert-data and will creat 
 
 ## Training your own model (Bonito)
 
-$ bonito train [-h] [--directory DIRECTORY] [--device DEVICE] [--lr LR] [--seed SEED] [--epochs EPOCHS] [--batch BATCH] [--chunks CHUNKS] [--validation_split VALIDATION_SPLIT][--amp] [-f] training_directory config
+       bonito train [-h] [--directory DIRECTORY] [--device DEVICE] [--lr LR] [--seed SEED] [--epochs EPOCHS] [--batch BATCH] [--chunks CHUNKS] [--validation_split VALIDATION_SPLIT][--amp] [-f] training_directory config
 
 Automatic mixed precision can be used to speed up training with the --amp flag (however apex needs to be installed manually).
 
 For multi-gpu training use the $CUDA_VISIBLE_DEVICES environment variable to select which GPUs and add the --multi-gpu flag.
 
-$ export CUDA_VISIBLE_DEVICES=0,1,2,3
-$ bonito train --amp --multi-gpu --batch 256 /data/model-dir
-To evaluate the pretrained model run bonito evaluate dna_r9.4.1.
+       export CUDA_VISIBLE_DEVICES=0,1,2,3
+       bonito train --amp --multi-gpu --batch 256 /data/model-dir
 
 For a model you have trainined yourself, replace dna_r9.4.1 with the model directory.
 
@@ -171,7 +168,7 @@ Installation of Bonito can be found on the [Bonito](https://github.com/nanoporet
 
 A PyTorch Basecaller for Oxford Nanopore Reads.
 
-$ bonito basecaller [-h] [--device DEVICE] [--weights WEIGHTS] [--beamsize BEAMSIZE] [--half] model_directory reads_directory > basecalls.fasta
+       bonito basecaller [-h] [--device DEVICE] [--weights WEIGHTS] [--beamsize BEAMSIZE] [--half] model_directory reads_directory > basecalls.fasta
 
 
 # Environment variables
