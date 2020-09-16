@@ -1,6 +1,10 @@
 # Fork details
 
-I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads for subsequent Bonito (ONT) basecalling.
+I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads using Taiyaki for subsequent Bonito (ONT) basecalling. First download and install both Taiyaki and Bonito from their original (and updated) repos:
+
+* [Taiyaki repository](https://github.com/nanoporetech/taiyaki)
+* [Bonito repository](https://github.com/nanoporetech/bonito)
+
 
 <p align="center">
   <img src="ONT_logo.png">
