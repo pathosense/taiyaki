@@ -1,16 +1,10 @@
 # Fork details
 
-I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads using Taiyaki for subsequent Bonito (ONT) basecalling. First download and install both Taiyaki and Bonito from their original (and updated) repos:
+I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads using Taiyaki for subsequent Bonito (ONT) basecalling. 
+First download and install both Taiyaki and Bonito from their original (and updated) repos:
 
+## Taiyaki
 * [Taiyaki repository](https://github.com/nanoporetech/taiyaki)
-* [Bonito repository](https://github.com/nanoporetech/bonito)
-
-
-<p align="center">
-  <img src="ONT_logo.png">
-</p>
-
-# Taiyaki
 
 Taiyaki is research software for training models for basecalling Oxford Nanopore reads. 
 
@@ -35,22 +29,19 @@ Taiyaki is built on top of pytorch and is compatible with Python 3.5 or later.
 It is aimed at advanced users, and it is an actively evolving research project, so
 expect to get your hands dirty.
 
+* [Bonito repository](https://github.com/nanoporetech/bonito)
+
+A PyTorch Basecaller for Oxford Nanopore Reads.
+
+
 # Contents
 
-1. [Installing system prerequisites](#installing-system-prerequisites)
-2. [Installing Taiyaki](#installing-taiyaki)
-3. [Tests](#tests)
-4. [Walk through](#walk-throughs-and-further-documentation)
-5. [Workflows](#workflows)<br>
-        * [Using the workflow Makefile](#using-the-workflow-makefile)<br>
+1. [Workflows](#workflows)<br>
         * [Steps from fast5 files to basecalling](#steps-from-fast5-files-to-basecalling)<br>
         * [Preparing a training set](#preparing-a-training-set)<br>
         * [Basecalling](#basecalling)<br>
         * [Modified bases](#modified-bases)<br>
         * [Abinitio training](#abinitio-training)<br>
-6. [Guppy compatibility](#guppy-compatibility)<br>
-        * [Q score calibration](#q-score-calibration)<br>
-        * [Standard model parameters](#standard-model-parameters)<br>
 7. [Environment variables](#environment-variables)
 8. [CUDA](#cuda)<br>
         * [Troubleshooting](#troubleshooting)<br>
@@ -59,81 +50,7 @@ expect to get your hands dirty.
         * [Choice of learning rates for multi-GPU training](#choice-of-learning-rates-for-multi-gpu-training)<br>
         * [Selection of GPUs](#selection-of-gpus-for-multi-gpu-training)<br>
         * [More than one multi-GPU training group on a single machine](#more-than-one-multi-gpu-training-group-on-a-single-machine)<br>
-10. [Running on SGE](#running-on-an-sge-cluster)<br>
-        * [Installation](#SGEinstall)<br>
-        * [Execution](#SGEexec)<br>
-        * [Selection of multiple GPUs in SGE](#SGEmultiGPU)<br>
-11. [Diagnostics](#diagnostics)
 
-
-# Installing system prerequisites
-
-To install required system packages on ubuntu 16.04:
-
-    sudo make deps
-
-Other linux platforms may be compatible, but are untested.
-
-In order to accelerate model training with a GPU you will need to install CUDA (which should install nvcc and add it to your path.)
-See instructions from NVIDIA and the [CUDA](#cuda) section below.
-
-Taiyaki also makes use of the OpenMP extensions for multi-processing.  These are supported
-by the system installed compiler on most modern Linux systems but require a more modern version
-of the clang/llvm compiler than that installed on MacOS machines.  Support for OpenMP was
-adding in clang/llvm in version 3.7 (see http://llvm.org or use brew). Alternatively you
-can install GCC on MacOS using homebrew.
-
-Some analysis scripts require a recent version of the [BWA aligner](https://github.com/lh3/bwa).
-
-Windows is not supported.
-
-# Installing Taiyaki
-
----
-**NOTE**
-If you intend to use Taiyaki with a GPU, make sure you have installed and set up [CUDA](#cuda) before proceeding.
----
-
-## Install Taiyaki in a new virtual environment (RECOMMENDED)
-
-We recommend installing Taiyaki in a self-contained [virtual environment](https://docs.python.org/3/tutorial/venv.html).
-
-The following command creates a complete environment for developing and testing Taiyaki, in the directory **venv**:
-
-    make install
-
-Taiyaki will be installed in [development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) so that you can easily test your changes.
-You will need to run `source venv/bin/activate` at the start of each session when you want to use this virtual environment.
-
-## Install Taiyaki system-wide or into activated Python environment
-
-This is not the recommended installation method: we recommend that you install taiyaki in its
-[own virtual environment](#install-taiyaki-in-a-new-virtual-environment) if possible.
-
-Taiyaki can be installed from source using either:
-
-    python3 setup.py install
-    python3 setup.py develop #[development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode)
-
-Alternatively, you can use pip with either:
-
-    pip install path/to/taiyaki/repo
-    pip install -e path/to/taiyaki/repo #[development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode)
-
-# Tests
-
-Tests can be run as follows, provided that the recommended `make install` installation method was used:
-
-    source venv/bin/activate   # activates taiyaki virtual environment (do this first)
-    make workflow              # runs scripts which carry out the workflow for basecall-network training and for squiggle-predictor training
-    make acctest               # runs acceptance tests
-    make unittest              # runs unit tests
-    make multiGPU_test         # runs multi-GPU test (GPUs 0 and 1 must be available, and CUDA must be installed - see below)
-
-# Walk throughs and further documentation
-For a walk-through of Taiyaki model training, including how to obtain sample training data, see [docs/walkthrough.rst](docs/walkthrough.rst).
-
-For an example of training a modifed base model, see [docs/modbase.rst](docs/modbase.rst).
 
 # Workflows
 
@@ -144,7 +61,7 @@ The paragraph below describes the steps in the workflow in more detail.
 The script **bin/prepare_mapped_reads.py** prepares a file containing mapped signals. This file is the main ingredient used to train a basecalling model.
 
 The simplest workflow looks like this. The flow runs from top to bottom and lines show the inputs required for each stage.
-The scripts in the Taiyaki package are shown, as are the files they work with.
+The scripts in the Taiyaki package are shown, as are the files they work with. All steps executed by Bonito are indicated with an *.
 
                        fast5 files
                       /          \
@@ -170,15 +87,15 @@ The scripts in the Taiyaki package are shown, as are the files they work with.
                          mapped-signal-file (hdf5)
                                     |
                                     |
-                             Bonito Convert
+                             Bonito Convert *
                        (Executed using Bonito tool)
                                     |
                                     |
-                               Bonito Train
+                               Bonito Train *
                        (Executed using Bonito tool)
                                     |
                                     |
-                     trained Bonito model in directory
+                     trained Bonito model in directory *
                        (suitable for use by Bonito)
                                    
 
@@ -209,20 +126,29 @@ As input to this script, we need a directory containing fast5 files (either sing
 
 The recommended way to produce this fasta file is as follows:
 
-  1. Align Guppy fastq basecalls to a reference genome using Guppy Aligner or Minimap. This will produce one or more SAM files.
-  2. Use the `get_refs_from_sam.py` script to extract a snippet of the reference for each mapped read. You can filter reads by coverage.
+  1. Extract read IDs from a given fastq read file.
 
-The final input required by `prepare_mapped_signal.py` is a pre-trained basecaller model, which is used to determine the alignment between raw signal and reference sequence.
-An example of such a model (for DNA sequenced with pore r9) is provided at `models/mGru256_flipflop_remapping_model_r9_DNA.checkpoint`.
-This does make the entire training process somewhat circular: you need a model to train a model.
-However, the new training set can be somewhat different from the data that the remapping model was trained on and things still work out.
-So, for example, if your samples are a bit weird and whacky, you may be able to improve basecall accuracy by retraining a model with Taiyaki.
-Internally, we use Taiyaki to train basecallers after incremental pore updates, and as a research tool into better basecalling methods.
-Taiyaki is not intended to enable training basecallers from scratch for novel nanopores.
-If it seems like remapping will not work for your data set, then you can use alternative methods
-so long as they produce data conformant with [this format](docs/FILE_FORMATS.md).
+    awk '{if(NR%4==1) print $1}' ./READS.fastq | sed -e "s/^@//" > READS.txt 
+
+  2. Extract reads from multi_read_fast5_file(s) based on a list of read_ids using the [ont_fast5_api](https://github.com/nanoporetech/ont_fast5_api#fast5_subset)  package
+ 
+    fast5_subset -i ./fast5 -s output_directory -l READS.txt 
+    
+  3. Align Guppy fastq basecalls to a reference genome using Guppy Aligner (or [Minimap2](https://github.com/lh3/minimap2). This will produce one or more .sam files.
+    
+    ~/ont-guppy/bin/guppy_aligner -i input_directory -s alignment --align_ref REFERENCE.fasta -t 8
+
+  4. Use the `get_refs_from_sam.py` script (Taiyaki) to extract a snippet of the reference for each mapped read. You can also filter reads by coverage.
+
 
 ## Convert to Bonito chunkify files
+Convert taiyaki chunkify file output using Bonito's convert-data and will creat the 4 .npy files required as input for bonito train 
+* chunks.npy with shape (665899, 4800)
+* chunk_lengths.npy with shape (665899,) 
+* references.npy with shape (665899, 400)
+* reference_lengths.npy shape (665899,)
+
+      bonito convert --chunks INT chunkify_file.hdf5 output_directory
 
 
 ## Training your own model (Bonito)
