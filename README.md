@@ -27,6 +27,9 @@ Taiyaki is built on top of pytorch and is compatible with Python 3.5 or later.
 It is aimed at advanced users, and it is an actively evolving research project, so
 expect to get your hands dirty.
 
+# Fork details
+
+I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads for subsequent Bonito (ONT) basecalling.
 
 # Contents
 
@@ -130,22 +133,6 @@ For an example of training a modifed base model, see [docs/modbase.rst](docs/mod
 
 # Workflows
 
-## Using the workflow Makefile 
-
-The file at **workflow/Makefile** can be used to direct the process of generating ingredients for training and then running the training itself.
-
-For example, if we have a directory **read_dir** containing fast5 files, and a fasta file **refs.fa** containing a ground-truth reference sequence for each read, we can (from the Taiyaki root directory) use the command line
-
-    make -f workflow/Makefile MAXREADS=1000 \
-        READDIR=read_dir USER_PER_READ_REFERENCE_FILE=refs.fa \
-        DEVICE=3 train_remapuser_ref
-
-This will place the training ingredients in a directory **RESULTS/training_ingredients** and the training output (including logs and trained models)
-in **RESULTS/remap_training**, using GPU 3 and only reading the first 1000 reads in the directory. The fast5 files may be single or multi-read.
-
-Using command line options to **make**, it is possible to change various other options, including the directory where the results go. Read the Makefile to find out about these options.
-The Makefile can also be used to follow a squiggle-mapping workflow.
-
 The paragraph below describes the steps in the workflow in more detail.
 
 ## Steps from fast5 files to basecalling
@@ -179,19 +166,17 @@ The scripts in the Taiyaki package are shown, as are the files they work with.
                          mapped-signal-file (hdf5)
                                     |
                                     |
-                         train_flipflop.py
-                         (also uses definition
-                         of model to be trained)
+                             Bonito Convert
+                       (Executed using Bonito tool)
                                     |
                                     |
-                         trained flip-flop model
+                               Bonito Train
+                       (Executed using Bonito tool)
                                     |
                                     |
-                              dump_json.py
-                                    |
-                                    |
-                         json model definition
-                         (suitable for use by Guppy)
+                     trained Bonito model in directory
+                       (suitable for use by Bonito)
+                                   
 
 Each script in bin/ has lots of options, which you can find out about by reading the scripts.
 Basic usage is as follows:
@@ -202,12 +187,10 @@ Basic usage is as follows:
 
     bin/prepare_mapped_reads.py <directory containing fast5 files> <per_read_tsv> <output mapped_signal_file>  <file containing model for remapping>  <reference_fasta>
 
-    bin/train_flipflop.py --device <digit specifying GPU> <pytorch model definition> <mapped-signal files to train with>
-
 Some scripts mentioned also have a useful option **--limit** which limits the number of reads to be used. This allows a quick test of a workflow.
 
 
-## Preparing a training set
+## Preparing a training set (Taiyaki)
 
 The `prepare_mapped_reads.py` script prepares a data set to use to train a new basecaller. Each member of this data set contains:
 
@@ -235,22 +218,7 @@ Taiyaki is not intended to enable training basecallers from scratch for novel na
 If it seems like remapping will not work for your data set, then you can use alternative methods
 so long as they produce data conformant with [this format](docs/FILE_FORMATS.md).
 
-
-## Basecalling
-
-Taiyaki comes with a script to perform flip-flop basecalling using a GPU.
-This script requires CUDA and cupy to be installed.
-
-Example usage:
-
-    bin/basecall.py <directory containing fast5s> <model checkpoint>  >  <output fasta>
-
-A limited range of models can also be used with Guppy, which will provide better performance and stability.
-See the section on [Guppy compatibility](#guppy-compatibility) for more details.
-
-Note: due to the RNA motor processing along the strand from 3' to 5', the base caller sees the read reversed relative to the natural orientation.  Use `bin/basecall.py --reverse` to output the basecall of the read in its natural direction.
-
-With the default settings, the script `taiyaki/bin/basecall.py` produces `fasta` files rather than `fastq`s, so no q-score calibration is needed. However the option `--fastq` may be used to generate fastqs instead. Because of a number of small differences between the implementation of basecalling in Guppy and Taiyaki, the q scores generated by the two systems will not be identical. Also see the section on qscore calibration below.
+## Basecalling (Bonito)
 
 
 ## Modified Bases
@@ -289,58 +257,6 @@ The models produced are not as accurate as those produced by the normal training
 
 
 The process is described in the [abinitio](docs/abinitio.rst) walk-through.
-
-## RNA
-
-During DNA sequencing, the strands of DNA go through the pore starting at the 5' end of the molecule. In contrast, during direct RNA sequencing the strands go through the pore starting at the 3' end. As a consequence, the per-read reference sequences used for RNA training must be **reversed** with respect to the genome/exome reference sequence (there is no need to **complement** the sequences). Basecalls produced with RNA models will then need to be reversed again in order to align them to a reference.
-
-In terms of the workflow described above, the following steps need to be changed:
-
-- If using `get_refs_from_sam.py` to produce per-read references, then add the `--reverse` option.
-- If using the `basecall.py` script in taiyaki, then add the `--reverse` option.
-- If basecalling with Guppy then use an RNA-specific config file (see the Guppy docs for more info).
-
-# Guppy compatibility
-
-In order to train a model that is compatible with Guppy (version 2.2 at time of writing), we recommend that you
-use the model defined in `models/mLstm_flipflop.py` and that you call `train_flipflop.py` with:
-
-    train_flipflop.py --size 256 --stride 5 --winlen 19 mLstm_flipflop.py <other options...>
-
-You should then be able to export your checkpoint to json (using bin/dump_json.py) that can be used to basecall with Guppy.
-
-See Guppy documentation for more information on how to do this.
-
-Key options include selecting the Guppy config file to be appropriate for your application, and passing the complete path of your .json file.
-
-For example:
-
-    guppy_basecaller --input_path /path/to/input_reads --save_path /path/to/save_dir --config dna_r9.4.1_450bps_flipflop.cfg --model path/to/model.json --device cuda:1
-
-Certain other model architectures may also be Guppy-compatible, but it is hard to give an exhaustive list
-and so we recommend you contact us to get confirmation.
-
-## Q score calibration
-
-The Guppy config file contains parameters `qscore_shift` and `qscore_scale` which calibrate the q scores in fastq files. These parameters can also be overridden
-by Guppy basecaller command-line options. Since these parameters are specific to a particular model, the calibration will be incorrect for newly-trained models.
-The Taiyaki script `misc/calibrate_qscores_byread.py` can be used to calculate shift and scale parameters for a new model. The ingredients needed are an
-alignment summary (which may be a .txt file generated by the Guppy aligner or a .samacc file generated by `taiyaki/misc/align.py`) and the fastq files that go with it.
-
-## Standard model parameters
-
-Because of differences in the chemistry, particularly sequencing speed, and sample rate, the models used in Guppy are trained with different parameters depending on condition.
-The default parameters for Taiyaki are generally those appropriate for a high accuracy DNA model and should be changed depending on what sample is being trained.
-The table below describes the parameters currently used to train the production models released as part of Guppy:
-
-
-| Condition                | chunk\_len\_min | chunk\_len\_max | size | stride | winlen |
-|--------------------------|-----------------|-----------------|------|--------|--------|
-| DNA, high accuracy       |    3000         |    8000         | 256  | 5      | 19     |
-| DNA, fast                |    2000         |    4000         |  96  | 5      | 19     |
-| RNA, high accuracy       |   10000         |   20000         | 256  | 10     | 31     |
-| RNA, fast                |   10000         |   20000         |  96  | 12     | 31     |
-
 
 # Environment variables
 
