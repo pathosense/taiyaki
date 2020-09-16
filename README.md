@@ -220,6 +220,7 @@ so long as they produce data conformant with [this format](docs/FILE_FORMATS.md)
 
 ## Basecalling (Bonito)
 
+Installation of Bonito can be found on the [Bonito](https://github.com/nanoporetech/bonito) repo. 
 
 ## Modified Bases
 
