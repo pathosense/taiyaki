@@ -1,3 +1,7 @@
+# Fork details
+
+I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads for subsequent Bonito (ONT) basecalling.
+
 <p align="center">
   <img src="ONT_logo.png">
 </p>
@@ -26,10 +30,6 @@ Main features:
 Taiyaki is built on top of pytorch and is compatible with Python 3.5 or later.
 It is aimed at advanced users, and it is an actively evolving research project, so
 expect to get your hands dirty.
-
-# Fork details
-
-I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads for subsequent Bonito (ONT) basecalling.
 
 # Contents
 
