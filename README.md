@@ -1,7 +1,7 @@
 # Fork details
 
-I (Nick) made this fork of Taiyaki to have a repo for file preparation of ONT fast5 reads using Taiyaki for subsequent Bonito (ONT) basecalling. 
-First download and install both Taiyaki and Bonito from their original (and updated) repos:
+I (Nick) made this fork of Taiyaki to have an all-in-one repo for preparation of Oxford Nanopore Technologies (ONT) sequencing fast5 reads using Taiyaki for subsequent Bonito basecalling. 
+First download and install both Taiyaki and Bonito from their original (and updated) repos. Example files can also be found on the original repos.
 
 ## Taiyaki
 * [Taiyaki repository](https://github.com/nanoporetech/taiyaki)
@@ -38,8 +38,9 @@ A PyTorch Basecaller for Oxford Nanopore Reads.
 
 1. [Workflows](#workflows)<br>
         * [Steps from fast5 files to basecalling](#steps-from-fast5-files-to-basecalling)<br>
-        * [Preparing a training set (Taiyaki)](#preparing-a-training-set)<br>
-        * [Basecalling (Bonito)](#basecalling)<br>
+        * [Preparing a training set (Taiyaki)](#preparing-a-training-set-(Taiyaki))<br>
+        * [Convert the chunkify files (Bonito)](#Convert-the-chunkify-files-(Bonito))<br>
+        * [Basecalling (Bonito)](#basecalling-(Bonito))<br>
 2. [Environment variables](#environment-variables)
 3. [CUDA](#cuda)<br>
         * [Troubleshooting](#troubleshooting)<br>
@@ -86,7 +87,7 @@ The scripts in the Taiyaki package are shown, as are the files they work with. A
                                     |
                                     |
                              Bonito Convert *
-                       (Executed using Bonito tool)
+                        (Convert .chunkify files)
                                     |
                                     |
                                Bonito Train *
@@ -139,7 +140,7 @@ The recommended way to produce this fasta file is as follows:
   4. Use the `get_refs_from_sam.py` script (Taiyaki) to extract a snippet of the reference for each mapped read. You can also filter reads by coverage.
 
 
-## Convert to Bonito chunkify files
+## Convert the .chunkify files (Bonito)
 Convert taiyaki chunkify file output using Bonito's convert-data and will creat the 4 .npy files required as input for bonito train 
 * chunks.npy with shape (665899, 4800)
 * chunk_lengths.npy with shape (665899,) 
