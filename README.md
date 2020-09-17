@@ -38,9 +38,10 @@ A PyTorch Basecaller for Oxford Nanopore Reads.
 
 1. [Workflows](#workflows)<br>
         * [Steps from fast5 files to basecalling](#steps-from-fast5-files-to-basecalling)<br>
-        * [Preparing a training set (Taiyaki)](#preparing-a-training-set-(Taiyaki))<br>
-        * [Convert the chunkify files (Bonito)](#Convert-the-chunkify-files-(Bonito))<br>
-        * [Basecalling (Bonito)](#basecalling-(Bonito))<br>
+        * [Preparing a training set](#preparing-a-training-set)<br>
+        * [Convert the chunkify files](#Convert-the-chunkify-files)<br>
+        * [Training your own model](#Training-your-own-model)<br>
+        * [Basecalling](#basecalling)<br>
 2. [Environment variables](#environment-variables)
 3. [CUDA](#cuda)<br>
         * [Troubleshooting](#troubleshooting)<br>
@@ -110,7 +111,7 @@ Basic usage is as follows:
 Some scripts mentioned also have a useful option **--limit** which limits the number of reads to be used. This allows a quick test of a workflow.
 
 
-## Preparing a training set (Taiyaki)
+## Preparing a training set
 
 The `prepare_mapped_reads.py` script prepares a data set to use to train a new basecaller. Each member of this data set contains:
 
@@ -140,7 +141,7 @@ The recommended way to produce this fasta file is as follows:
   4. Use the `get_refs_from_sam.py` script (Taiyaki) to extract a snippet of the reference for each mapped read. You can also filter reads by coverage.
 
 
-## Convert the .chunkify files (Bonito)
+## Convert the chunkify files 
 Convert taiyaki chunkify file output using Bonito's convert-data and will creat the 4 .npy files required as input for bonito train 
 * chunks.npy with shape (665899, 4800)
 * chunk_lengths.npy with shape (665899,) 
@@ -150,7 +151,7 @@ Convert taiyaki chunkify file output using Bonito's convert-data and will creat 
       bonito convert --chunks INT chunkify_file.hdf5 output_directory
 
 
-## Training your own model (Bonito)
+## Training your own model
 
        bonito train [-h] [--directory DIRECTORY] [--device DEVICE] [--lr LR] [--seed SEED] [--epochs EPOCHS] [--batch BATCH] [--chunks CHUNKS] [--validation_split VALIDATION_SPLIT][--amp] [-f] training_directory config
 
@@ -163,7 +164,7 @@ For multi-gpu training use the $CUDA_VISIBLE_DEVICES environment variable to sel
 
 For a model you have trainined yourself, replace dna_r9.4.1 with the model directory.
 
-## Basecalling (Bonito)
+## Basecalling
 
 Installation of Bonito can be found on the [Bonito](https://github.com/nanoporetech/bonito) repo. 
 
